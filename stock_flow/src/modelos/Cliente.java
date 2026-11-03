@@ -5,15 +5,22 @@ public class Cliente {
 	private String nome;
 	private String cpf;
 	private String email;
-	public Cliente(int cod_cliente, String nome, String cpf, String email) {
+	public Cliente(String nome, String cpf, String email) {
 		super();
-		this.cod_cliente = cod_cliente;
 		this.nome = nome;
 		this.cpf = cpf;
 		this.email = email;
 	}
 	public Cliente() {
 		super();
+	}
+	
+	public Cliente(int cod_cliente, String nome, String cpf, String email) {
+		super();
+		this.cod_cliente = cod_cliente;
+		this.nome = nome;
+		this.cpf = cpf;
+		this.email = email;
 	}
 	public int getCod_cliente() {
 		return cod_cliente;

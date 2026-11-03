@@ -12,6 +12,14 @@ public class Fornecedor {
 		this.telefone = telefone;
 		this.email = email;
 	}
+	
+	public Fornecedor(long razao_social, long telefone, long email) {
+		super();
+		this.razao_social = razao_social;
+		this.telefone = telefone;
+		this.email = email;
+	}
+
 	public Fornecedor() {
 		super();
 	}
