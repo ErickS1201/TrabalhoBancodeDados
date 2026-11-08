@@ -1,7 +1,7 @@
 package modelos;
 import java.sql.*;
 public class ConexaoSGBD {
-	private static final String URL ="jdbc:postgresql://localhost:5432/StockFlow";
+	private static final String URL ="jdbc:postgresql://localhost:5432/stockflow";
 	private static final String usuario ="postgres";
 	private static final String senha ="senha123";
 	
