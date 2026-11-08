@@ -29,8 +29,17 @@ public class Pedido {
 		this.valor = valor;
 		this.status = status;
 	}
-
 	
+	
+	
+
+	@Override
+	public String toString() {
+		return "Pedido [cod_pedido=" + cod_pedido + ", cliente=" + cliente + ", pagamento=" + pagamento
+				+ ", data_pedido=" + data_pedido + ", valor=" + valor + ", status=" + status + ", itens=" + itens + "]";
+	}
+
+
 
 	public ArrayList<PedidoProduto> getItens() {
 		return itens;

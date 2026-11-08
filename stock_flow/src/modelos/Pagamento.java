@@ -31,6 +31,12 @@ public class Pagamento {
 		this.valor = valor;
 		this.data_pagamento = data_pagamento;
 	}
+			
+	@Override
+	public String toString() {
+		return "Pagamento [cod_pagamento=" + cod_pagamento + ", forma=" + forma + ", status=" + status + ", valor="
+				+ valor + ", data_pagamento=" + data_pagamento + "]";
+	}
 	public int getCod_pagamento() {
 		return cod_pagamento;
 	}

@@ -27,6 +27,12 @@ public class Produto {
 		this.preco_produto = preco_produto;
 		this.qtd_estoque = qtd_estoque;
 	}
+	
+	@Override
+	public String toString() {
+		return "COD: " + cod_produto +", NOME: " + nome_produto+", CAT: " + categoria.getNome_categoria() +
+				", PREÇO: " + preco_produto + ", QTD DISPONIVEL: " + qtd_estoque;
+	}
 
 	public long getCod_produto() {
 		return cod_produto;

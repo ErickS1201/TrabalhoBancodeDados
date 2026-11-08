@@ -18,6 +18,12 @@ public class PedidoProduto {
 	public Pedido getPedido() {
 		return pedido;
 	}
+	
+	@Override
+	public String toString() {
+		return "PedidoProduto [pedido=" + pedido + ", produto=" + produto + ", qtdComprada=" + qtdComprada
+				+ ", valor_venda=" + valor_venda + "]";
+	}
 	public void setPedido(Pedido pedido) {
 		this.pedido = pedido;
 	}

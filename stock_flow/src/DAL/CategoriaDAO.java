@@ -1,8 +1,10 @@
-package modelos;
+package DAL;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+
+import modelos.*;
 
 public class CategoriaDAO {
 	public void salvar(Categoria categoria) {
@@ -49,7 +51,26 @@ public class CategoriaDAO {
 		}finally {
 			fecharRecursos(con, stm, rs);
 		}
+		if(categoria.getCod_categoria()==0)System.out.println("Categoria nao encontrada");
 		return categoria;
+	}
+	public void atualizarCategoria(int cod_categoria, Categoria categoria) {
+		Categoria cat = buscarPorCod(cod_categoria);
+		if(cat.getCod_categoria() !=0) {
+			String sql = "UPDATE categoria SET nome_categoria = '"+categoria.getNome_categoria()+"', descricao = '"+categoria.getDescricao()+"' WHERE cod_categoria = "+cod_categoria;
+			Connection con = null;
+			Statement stm = null;
+			try {
+				con = ConexaoSGBD.getConnection();
+				stm = con.createStatement();
+				stm.execute(sql);
+				System.out.println("Categoria atualizada com sucesso");
+			}catch(SQLException e) {
+				e.printStackTrace();
+			}finally {
+				fecharRecursos(con, stm, null);
+			}
+		}
 	}
 	public List<Categoria> listarCategorias(){
 		String sql = "select cod_categoria, nome_categoria, descricao from categoria";

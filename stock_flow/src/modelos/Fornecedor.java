@@ -19,6 +19,12 @@ public class Fornecedor {
 		this.telefone = telefone;
 		this.email = email;
 	}
+	
+	@Override
+	public String toString() {
+		return "Fornecedor [id=" + id + ", razao_social=" + razao_social + ", telefone=" + telefone + ", email=" + email
+				+ "]";
+	}
 
 	public Fornecedor() {
 		super();
