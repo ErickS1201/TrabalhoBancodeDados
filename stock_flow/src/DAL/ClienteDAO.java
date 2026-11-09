@@ -56,32 +56,42 @@ public class ClienteDAO {
 	
 	}
 	public Cliente buscarPorCod(int cod) {
-		String sql = "SELECT * FROM CLIENTE WHERE cod_cliente = "+cod;
+		String sql = "SELECT * FROM CLIENTE WHERE cod_cliente = ?";
+
 		Connection con = null;
-		Statement stm = null;
+		PreparedStatement stn = null;
 		ResultSet rs = null;
+
 		Cliente cliente = new Cliente();
+
 		try {
 			con = ConexaoSGBD.getConnection();
-			stm = con.createStatement();
-			rs = stm.executeQuery(sql);
-			
-			if(rs.next()) {
-				cliente.setCod_cliente(rs.getInt("cod_cliente"));
-				cliente.setNome(rs.getString("nome_cliente"));
-				cliente.setCpf(rs.getString("cpf_cliente"));
-				cliente.setEmail(rs.getString("email_cliente"));
-				cliente.setTel(rs.getString("telefone_cliente"));
-				
-			}
-		}catch(SQLException e) {
-			e.printStackTrace();
-		}finally {
-			fecharRecursos(con, stm, rs);
-		}
-		
-		if(cliente.getCod_cliente() == 0)System.out.println("Cliente nao encontrado");
-		return cliente;
+
+			stn = con.prepareStatement(sql);
+
+			stn.setInt(1, cod);
+
+		if (rs.next()) {
+            cliente.setCod_cliente(rs.getInt("cod_cliente"));
+            cliente.setNome(rs.getString("nome_cliente"));
+            cliente.setCpf(rs.getString("cpf_cliente"));
+            cliente.setEmail(rs.getString("email_cliente"));
+            cliente.setTel(rs.getString("telefone_cliente"));
+        }
+
+    } catch (SQLException e) {
+        e.printStackTrace();
+
+    } finally {
+        fecharRecursos(con, stn, rs);
+    }
+
+    if (cliente.getCod_cliente() == 0) {
+        System.out.println("Cliente nao encontrado");
+    }
+
+    return cliente;
+
 	
 	}
 	public void atualizarCliente(int cod, Cliente cliente) {

@@ -62,6 +62,11 @@ public class ProdutoDAO {
 			else {
 				System.out.println("Produto nao encontrado");
 			}
+		} catch (SQLException e) {
+    e.printStackTrace();
+
+			} finally {
+    		fecharRecursos(con, stm, null);
 		}
 	}
 	public void listarDisponiveis() {
