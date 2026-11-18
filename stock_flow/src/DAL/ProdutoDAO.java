@@ -164,4 +164,121 @@ public class ProdutoDAO {
 			e.printStackTrace();
 		}
 	}
+
+		public void realizarCompra(Cliente cliente, long codProduto, int quantidade, String formaPagamento) {
+		Produto produto = buscarPorCod(codProduto);
+
+		if (produto == null) {
+			System.out.println("Produto nao encontrado!");
+			return;
+		}
+		if (quantidade <= 0 || produto.getQtd_estoque() < quantidade) {
+			System.out.println("Quantidade invalida ou estoque insuficiente! Disponivel: " + produto.getQtd_estoque());
+			return;
+		}
+
+		double valorTotal = produto.getPreco_produto() * quantidade;
+		Connection con = null;
+		PreparedStatement pstPag = null;
+		PreparedStatement pstPed = null;
+		PreparedStatement pstItem = null;
+		ResultSet rs = null;
+
+		try {
+			con = ConexaoSGBD.getConnection();
+
+			// 1. Cria o pagamento e pega o ID gerado
+			String sqlPag = "INSERT INTO pagamento (forma_pagamento, status_pagamento) VALUES (?, 'PROCESSADO') RETURNING cod_pagamento";
+			pstPag = con.prepareStatement(sqlPag);
+			pstPag.setString(1, formaPagamento);
+			rs = pstPag.executeQuery();
+			int codPagamento = 0;
+			if (rs.next()) {
+				codPagamento = rs.getInt("cod_pagamento");
+			}
+			rs.close();
+
+			// 2. Cria o pedido vinculado ao cliente e ao pagamento
+			String sqlPed = "INSERT INTO pedido (cod_cliente, cod_pagamento, valor_pedido, status_pedido) VALUES (?, ?, ?, 'PAGO') RETURNING cod_pedido";
+			pstPed = con.prepareStatement(sqlPed);
+			pstPed.setInt(1, cliente.getCod_cliente());
+			pstPed.setInt(2, codPagamento);
+			pstPed.setDouble(3, valorTotal);
+			rs = pstPed.executeQuery();
+			int codPedido = 0;
+			if (rs.next()) {
+				codPedido = rs.getInt("cod_pedido");
+			}
+
+			// 3. Vincula o produto ao pedido na tabela pedido_produto
+			String sqlItem = "INSERT INTO pedido_produto (cod_pedido, cod_produto, quantidade) VALUES (?, ?, ?)";
+			pstItem = con.prepareStatement(sqlItem);
+			pstItem.setInt(1, codPedido);
+			pstItem.setLong(2, codProduto);
+			pstItem.setInt(3, quantidade);
+			pstItem.executeUpdate();
+
+			// 4. Atualiza o estoque do produto
+			produto.setQtd_estoque(produto.getQtd_estoque() - quantidade);
+			atualizarProduto(codProduto, produto);
+
+			System.out.println("Compra realizada com sucesso! Pedido #" + codPedido + " - Total: R$ " + valorTotal);
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (rs != null) rs.close();
+				if (pstPag != null) pstPag.close();
+				if (pstPed != null) pstPed.close();
+				if (pstItem != null) pstItem.close();
+				if (con != null) con.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+		public void listarPedidosCliente(int codCliente) {
+		String sql = "SELECT p.cod_pedido, p.data_pedido, p.valor_pedido, p.status_pedido, " +
+					 "pag.forma_pagamento, pr.nome_produto, pp.quantidade " +
+					 "FROM pedido p " +
+					 "INNER JOIN pagamento pag ON p.cod_pagamento = pag.cod_pagamento " +
+					 "INNER JOIN pedido_produto pp ON p.cod_pedido = pp.cod_pedido " +
+					 "INNER JOIN produto pr ON pp.cod_produto = pr.cod_produto " +
+					 "WHERE p.cod_cliente = ? ORDER BY p.cod_pedido DESC";
+
+		Connection con = null;
+		PreparedStatement pst = null;
+		ResultSet rs = null;
+
+		try {
+			con = ConexaoSGBD.getConnection();
+			pst = con.prepareStatement(sql);
+			pst.setInt(1, codCliente);
+			rs = pst.executeQuery();
+
+			boolean temPedido = false;
+			System.out.println("\n--- Seus Pedidos ---");
+			while (rs.next()) {
+				temPedido = true;
+				System.out.println(
+					"Pedido #" + rs.getInt("cod_pedido") +
+					" | Produto: " + rs.getString("nome_produto") +
+					" (Qtd: " + rs.getInt("quantidade") + ")" +
+					" | Total: R$ " + rs.getDouble("valor_pedido") +
+					" | Pagamento: " + rs.getString("forma_pagamento") +
+					" | Status: " + rs.getString("status_pedido")
+				);
+			}
+
+			if (!temPedido) {
+				System.out.println("Voce ainda nao realizou nenhum pedido.");
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			fecharRecursos(con, pst, rs);
+		}
+	}
+
 }

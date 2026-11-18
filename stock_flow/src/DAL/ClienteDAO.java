@@ -70,7 +70,7 @@ public class ClienteDAO {
 			stn = con.prepareStatement(sql);
 
 			stn.setInt(1, cod);
-
+				rs = stn.executeQuery();
 		if (rs.next()) {
             cliente.setCod_cliente(rs.getInt("cod_cliente"));
             cliente.setNome(rs.getString("nome_cliente"));

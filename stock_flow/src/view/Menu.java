@@ -65,21 +65,79 @@ public class Menu {
 	}
 
 	private void menuInicial(Cliente cliente) {
-		System.out.println("Bem vindo, "+cliente.getNome());
-		do {
-			System.out.println("Selecione uma opcao: ");
-			System.out.println("1: Comprar produto");
-			System.out.println("2: Atualizar perfil");
-			System.out.println("3: Mostrar pedidos");
-			switch(op) {
-			case 1:
-				ProdutoDAO produto = new ProdutoDAO();
-				produto.listarDisponiveis();
-			}
-		}while(op!= 0);
-	}
+    System.out.println("Bem vindo, " + cliente.getNome());
+    int opcaoMenu = -1;
 
-	public Cliente login(String nome, String cpf) {
+    do {
+        System.out.println("\nSelecione uma opcao: ");
+        System.out.println("1: Comprar produto");
+        System.out.println("2: Atualizar perfil");
+        System.out.println("3: Mostrar pedidos");
+        System.out.println("0: Sair");
+        
+        opcaoMenu = tc.nextInt();
+        tc.nextLine(); 
+
+        switch (opcaoMenu) {
+
+            case 1:
+                ProdutoDAO produtoDAO = new ProdutoDAO();
+                produtoDAO.listarDisponiveis();
+
+                System.out.println("\nDigite o COD do produto que deseja comprar (ou 0 para cancelar): ");
+                long codProd = tc.nextLong();
+                tc.nextLine();
+
+                if (codProd != 0) {
+                    System.out.println("Digite a quantidade: ");
+                    int qtd = tc.nextInt();
+                    tc.nextLine();
+
+                    System.out.println("Forma de pagamento (PIX, CREDITO, DEBITO, CARTEIRA): ");
+                    String forma = tc.nextLine().toUpperCase();
+
+                    produtoDAO.realizarCompra(cliente, codProd, qtd, forma);
+                }
+                break;
+
+            case 2:
+                System.out.println("\n--- Atualizar Perfil ---");
+                System.out.println("Nome atual: " + cliente.getNome() + " | Digite o novo nome: ");
+                String novoNome = tc.nextLine();
+
+                System.out.println("CPF atual: " + cliente.getCpf() + " | Digite o novo CPF (11 digitos): ");
+                String novoCpf = tc.nextLine();
+
+                System.out.println("Email atual: " + cliente.getEmail() + " | Digite o novo email: ");
+                String novoEmail = tc.nextLine();
+
+                System.out.println("Telefone atual: " + cliente.getTel() + " | Digite o novo telefone: ");
+                String novoTel = tc.nextLine();
+
+                cliente.setNome(novoNome);
+                cliente.setCpf(novoCpf);
+                cliente.setEmail(novoEmail);
+                cliente.setTel(novoTel);
+
+                ClienteDAO clienteDAO = new ClienteDAO();
+                clienteDAO.atualizarCliente(cliente.getCod_cliente(), cliente);
+                break;
+
+            case 3:
+                ProdutoDAO prodDAO = new ProdutoDAO();
+                prodDAO.listarPedidosCliente(cliente.getCod_cliente());
+                break;
+
+            case 0:
+                System.out.println("Saindo da conta...");
+                break;
+            default:
+                System.out.println("Opcao invalida!");
+                break;
+        }
+    } while (opcaoMenu != 0);
+}
+public Cliente login(String nome, String cpf) {
 		ClienteDAO dao = new ClienteDAO();
 		Cliente cl = dao.buscarPorCpf(cpf);
 		if(cl.getNome()!=null && cl.getNome().equalsIgnoreCase(nome)) {
@@ -90,3 +148,6 @@ public class Menu {
 		}
 }
 }
+
+	
+
