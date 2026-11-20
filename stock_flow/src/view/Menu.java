@@ -1,5 +1,6 @@
 package view;
 
+import java.util.List;
 import java.util.Scanner;
 
 import DAL.*;
@@ -17,7 +18,7 @@ public class Menu {
 		System.out.println("Aperte 1 para Login e 2 para criar conta ou 0 para sair:");
 		op = tc.nextInt();
 		tc.nextLine();
-		if (op == 1) {
+		if (op == 1 || op == 9) {
 			System.out.println("Digite seu nome: ");
 			nome = tc.nextLine();
 			System.out.println("Digite seu cpf");
@@ -26,17 +27,19 @@ public class Menu {
 			Cliente cl = null;
 			if (logado)
 				cl = login(nome, cpf);
-				menuInicial(cl);
+				if(op==1)menuInicial(cl);
+				if(op==9)menuAdmin(cl);
 			
 		} else if (op == 2) {
 			criarConta();
 		} else if (op == 0) {
 			System.out.println("Saindo do sistema");
-			logado = true;
+			logado = false;
 		}
 
-	}while(!logado);
+	}while(logado);
 	}
+	
 	private void criarConta() {
 		ClienteDAO dao = new ClienteDAO();
 		String cpf="";
@@ -62,6 +65,57 @@ public class Menu {
 		}else {
 			System.out.println("Algo deu errado na criação de login");
 		}
+	}
+	private void menuAdmin(Cliente cliente) {
+		System.out.println("Bem vindo"+cliente.getNome());
+		int opcaoMenu =-1;
+		do {
+			System.out.println("\nSelecione uma opcao: ");
+			System.out.println("1- Cadastrar produto");
+			System.out.println("2- Cadastrar fornecedor");
+			System.out.println("3- Cadastrar categoria de produtos");
+			System.out.println("4- Excluir produto");
+			opcaoMenu= tc.nextInt();
+			tc.nextLine();
+			switch(opcaoMenu) {
+			case 1:
+				cadastrarProduto();
+				break;
+			}
+		}while (opcaoMenu != 0);
+		
+	}
+	private void cadastrarProduto() {
+		CategoriaDAO cat = new CategoriaDAO();
+		List<Categoria> categorias = cat.listarCategorias();
+		System.out.println("Digite o nome do produto:");
+		String nome = tc.nextLine();
+		tc.nextLine();
+		System.out.println("Selecione o codigo de uma categoria \nou digite -1 para criar uma nova: ");		
+		for (Categoria categoria : categorias) {
+			System.out.println("COD:"+categoria.getCod_categoria()+" - CATEGORIA: "+categoria.getNome_categoria());
+		}
+		int cod = tc.nextInt();
+		if(cod == -1) {
+			cadastrarCategoria();
+			for (Categoria categoria : categorias) {
+				System.out.println("COD:"+categoria.getCod_categoria()+" - CATEGORIA: "+categoria.getNome_categoria());
+				}
+			System.out.println("Selecione o codigo");
+			cod= tc.nextInt();
+		}
+		Categoria categoria = cat.buscarPorCod(cod);
+		System.out.println("Digite o preco do produto: ");
+		double preco = tc.nextDouble();
+		System.out.println("Digite a quantidade de produtos no estoque: ");
+		int estoque = tc.nextInt();
+		Produto prod = new Produto(categoria, nome, preco, estoque);
+		ProdutoDAO pdao = new ProdutoDAO();
+		pdao.salvarProduto(prod);
+	}
+	private void cadastrarCategoria() {
+		// TODO Auto-generated method stub
+		
 	}
 
 	private void menuInicial(Cliente cliente) {

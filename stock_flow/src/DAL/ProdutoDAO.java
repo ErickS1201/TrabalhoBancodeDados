@@ -211,7 +211,7 @@ public class ProdutoDAO {
 			}
 
 			// 3. Vincula o produto ao pedido na tabela pedido_produto
-			String sqlItem = "INSERT INTO pedido_produto (cod_pedido, cod_produto, quantidade) VALUES (?, ?, ?)";
+			String sqlItem = "INSERT INTO pedido_produto (cod_pedido, cod_produto, qtd_comprada) VALUES (?, ?, ?)";
 			pstItem = con.prepareStatement(sqlItem);
 			pstItem.setInt(1, codPedido);
 			pstItem.setLong(2, codProduto);
@@ -240,7 +240,7 @@ public class ProdutoDAO {
 	}
 		public void listarPedidosCliente(int codCliente) {
 		String sql = "SELECT p.cod_pedido, p.data_pedido, p.valor_pedido, p.status_pedido, " +
-					 "pag.forma_pagamento, pr.nome_produto, pp.quantidade " +
+					 "pag.forma_pagamento, pr.nome_produto, pp.qtd_comprada " +
 					 "FROM pedido p " +
 					 "INNER JOIN pagamento pag ON p.cod_pagamento = pag.cod_pagamento " +
 					 "INNER JOIN pedido_produto pp ON p.cod_pedido = pp.cod_pedido " +
@@ -264,7 +264,7 @@ public class ProdutoDAO {
 				System.out.println(
 					"Pedido #" + rs.getInt("cod_pedido") +
 					" | Produto: " + rs.getString("nome_produto") +
-					" (Qtd: " + rs.getInt("quantidade") + ")" +
+					" (Qtd: " + rs.getInt("qtd_comprada") + ")" +
 					" | Total: R$ " + rs.getDouble("valor_pedido") +
 					" | Pagamento: " + rs.getString("forma_pagamento") +
 					" | Status: " + rs.getString("status_pedido")
