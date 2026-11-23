@@ -211,7 +211,7 @@ public class ProdutoDAO {
 			}
 
 			// 3. Vincula o produto ao pedido na tabela pedido_produto
-			String sqlItem = "INSERT INTO pedido_produto (cod_pedido, cod_produto, qtd_comprada) VALUES (?, ?, ?)";
+			String sqlItem = "INSERT INTO pedido_produto (cod_pedido, cod_produto, quantidade) VALUES (?, ?, ?)";
 			pstItem = con.prepareStatement(sqlItem);
 			pstItem.setInt(1, codPedido);
 			pstItem.setLong(2, codProduto);
@@ -240,7 +240,7 @@ public class ProdutoDAO {
 	}
 		public void listarPedidosCliente(int codCliente) {
 		String sql = "SELECT p.cod_pedido, p.data_pedido, p.valor_pedido, p.status_pedido, " +
-					 "pag.forma_pagamento, pr.nome_produto, pp.qtd_comprada " +
+					 "pag.forma_pagamento, pr.nome_produto, pp.quantidade " +
 					 "FROM pedido p " +
 					 "INNER JOIN pagamento pag ON p.cod_pagamento = pag.cod_pagamento " +
 					 "INNER JOIN pedido_produto pp ON p.cod_pedido = pp.cod_pedido " +
@@ -264,7 +264,7 @@ public class ProdutoDAO {
 				System.out.println(
 					"Pedido #" + rs.getInt("cod_pedido") +
 					" | Produto: " + rs.getString("nome_produto") +
-					" (Qtd: " + rs.getInt("qtd_comprada") + ")" +
+					" (Qtd: " + rs.getInt("quantidade") + ")" +
 					" | Total: R$ " + rs.getDouble("valor_pedido") +
 					" | Pagamento: " + rs.getString("forma_pagamento") +
 					" | Status: " + rs.getString("status_pedido")
@@ -280,5 +280,39 @@ public class ProdutoDAO {
 			fecharRecursos(con, pst, rs);
 		}
 	}
+	public void reporEstoque(long codProduto, int quantidadeAdicionar){
+		if (quantidadeAdicionar <= 0) {
+			System.out.println("Quantia inválida!");
+			return;
+		}
 
+		String sql = "UPDATE produto SET qtd_estoque = qtd_estoque + ? WHERE cod_produto = ?";
+
+		Connection con = null;
+		PreparedStatement pst = null;
+
+		try{
+			con = ConexaoSGBD.getConnection();
+			pst = con.prepareStatement(sql);
+			pst.setInt(1, quantidadeAdicionar);
+			pst.setLong(2, codProduto);
+
+			int linhas = pst.executeUpdate();
+			if (linhas > 0) {
+				System.out.println("Estoque atualizado com sucesso!");
+			} else {
+				System.out.println("Produto nao encontrado!");
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (pst != null) pst.close();
+				if (con != null) con.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		
+	}
 }
